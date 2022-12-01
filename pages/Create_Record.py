@@ -6,7 +6,7 @@ db = mysql.connector.connect(
     host = "localhost",
     user = "root",
     password = "CPSC408!",
-    database = "PrinterPalace"
+    database = "Printer_Palace"
 )
 
 st.markdown("<h1 style='text-align: center;'>New Record</h1>", unsafe_allow_html=True)
@@ -33,5 +33,24 @@ def create_record():
         "Create a new...",
         ("Filament", "Filament brand", "Filament type")
         )
+    
+    if (table_selection == "Printer"):
+        printer_name = st.text_input("Printer name :")
+        cursor.execute(
+            """
+            SELECT DISTINCT brand_name
+            FROM printer_brand
+            """
+        )
+        brands = cursor.fetchall()
+        printer_brands = list(chain(*brands))
+        brand_selection = st.selectbox(
+            "Select a printer brand",
+            (printer_brands)
+        )
+
+
+
+
 
 create_record()
