@@ -11,16 +11,6 @@ db = mysql.connector.connect(
 
 cursor = db.cursor()
 
-cursor.execute(
-    """
-    SELECT *
-    FROM filament
-    WHERE filament_type = "PLA" AND brand_name = "Prusament"
-    """
-)
-
-st.write(cursor.fetchall())
-
 
 col1, col2, col3 = st.columns([1,4.5,1])
 

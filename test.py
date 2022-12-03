@@ -6,30 +6,30 @@ import streamlit as st
 from itertools import chain
 
 
-db = mysql.connector.connect(
-        host = "localhost",
-        user = "root",
-        password = "CPSC408!",
-        database = "sakila"
-    )
+# db = mysql.connector.connect(
+#         host = "localhost",
+#         user = "root",
+#         password = "CPSC408!",
+#         database = "sakila"
+#     )
 
-cursor = db.cursor()
-cursor.execute(
-    """
-    SELECT first_name
-    FROM actor
-    """
-)
+# cursor = db.cursor()
+# cursor.execute(
+#     """
+#     SELECT first_name
+#     FROM actor
+#     """
+# )
 
-nameData = cursor.fetchall()
+# nameData = cursor.fetchall()
 
-names = list(chain(*nameData))
+# names = list(chain(*nameData))
 
 
-st.selectbox(
-    "select",
-    (names)
-)
+# st.selectbox(
+#     "select",
+#     (names)
+# )
 
 # def search():
 #     st.markdown("<h1 style='text-align: center;'>Search</h1>", unsafe_allow_html=True)
@@ -75,25 +75,25 @@ st.selectbox(
 # create_button = st.sidebar.button("Create", on_click = update)
 
 
-# # db = mysql.connector.connect(
-# #     host = "localhost",
-# #     user = "root",
-# #     password = "CPSC408!",
-# #     database = "sakila"
-# # )
+db = mysql.connector.connect(
+    host = "localhost",
+    user = "root",
+    password = "CPSC408!",
+    database = "sakila"
+)
 
-# # cursor = db.cursor()
-# # cursor.execute(
-# #     """
-# #     SELECT *
-# #     FROM actor
-# #     """
-# # )
+cursor = db.cursor()
+cursor.execute(
+    """
+    SELECT *
+    FROM actor
+    """
+)
 
-# # columns = [column[0] for column in cursor.description]
-# # data = cursor.fetchall()
+columns = [column[0] for column in cursor.description]
+data = cursor.fetchall()
 
-# # df = pd.DataFrame(data, columns=columns)
+df = pd.DataFrame(data, columns=columns)
 
-# # print(df)
+st.write(df)
 

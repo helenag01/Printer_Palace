@@ -20,7 +20,7 @@ st.markdown("<h1 style='text-align: center;'>New Record</h1>", unsafe_allow_html
 cursor = db.cursor()
 category = st.selectbox(
 "Select a category :",
-("Printer Model", "FFF Printer", "SLA Printer", "Resin", "Filament")
+("","Printer Model", "FFF Printer", "SLA Printer", "Resin", "Filament")
 )
         
 if (category == "Printer Model"):
@@ -28,11 +28,11 @@ if (category == "Printer Model"):
     brand_name = st.text_input("Brand :")
     printer_type = st.selectbox(
         "Type :",
-        ("fff", "sla")
+        ("", "fff", "sla")
     )
-    bed_width = st.text_input("Bed width :")
-    bed_length = st.text_input("Bed length :")
-    bed_height = st.text_input("Bed height :")
+    bed_width = st.number_input("Bed width :")
+    bed_length = st.number_input("Bed length :")
+    bed_height = st.number_input("Bed height :")
     printer_model_button = st.button("Commit")
 elif (category == "FFF Printer"):
     printer_name = st.text_input("Name :")
@@ -46,20 +46,11 @@ elif (category == "FFF Printer"):
     models = list(chain(*cursor.fetchall()))
     model_name = st.selectbox(
         "Model :",
-        (models)
+        ("", models)
     )
-    current_nozzle_type = st.selectbox(
-        "Nozzle type :",
-        ("brass", "steel")
-    )
-    current_nozzle_size = st.selectbox(
-        "Nozzle size :",
-        (0.25, 0.40, 0.60)
-    )
-    current_bed_type = st.selectbox(
-        "Bed type :",
-        ("textured", "smooth")
-    )
+    current_nozzle_type = st.text_input("Nozzle type :")
+    current_nozzle_size = st.number_input("Nozzle size :")
+    current_bed_type = st.text_input("Bed type :")
     cursor.execute(
         """
         SELECT DISTINCT filament_type
@@ -69,7 +60,7 @@ elif (category == "FFF Printer"):
     filament_types = list(chain(*cursor.fetchall()))
     filament_type = st.selectbox(
         "Filament type :",
-        (filament_types)
+        ("", filament_types)
     )
     cursor.execute(
         """
@@ -95,7 +86,7 @@ elif (category == "FFF Printer"):
     colors = list(chain(*cursor.fetchall()))
     filament_color = st.selectbox(
         "Filament color :",
-        (colors)
+        ("", colors)
     )
     cursor.execute(
         """
@@ -106,6 +97,7 @@ elif (category == "FFF Printer"):
         (filament_type, filament_brand, filament_color)
     )
     current_filament_id = cursor.fetchone()
+    fff_button = st.button("Commit")
 elif (category == "SLA Printer"):
     printer_name = st.text_input("Name :")
     model_name = st.text_input("Model :")
@@ -118,7 +110,7 @@ elif (category == "SLA Printer"):
     resin_names = list(chain(*cursor.fetchall()))
     resin_name = st.selectbox(
         "Resin brand name :",
-        (resin_names)
+        ("", resin_names)
     )
     cursor.execute(
         """
@@ -131,7 +123,7 @@ elif (category == "SLA Printer"):
     resin_colors = list(chain(*cursor.fetchall()))
     resin_color = st.selectbox(
         "Resin color :",
-        (resin_colors)
+        ("", resin_colors)
     )
     cursor.execute(
         """
@@ -139,75 +131,77 @@ elif (category == "SLA Printer"):
         FROM resin
         WHERE brand_name = %s AND color = %s
         """,
-        (resin_name, resin_color)
+        (resin_name.upper(), resin_color.upper())
     )
     current_resin_id = cursor.fetchone()
+    sla_button = st.button("Commit")
 elif (category == "Resin"):
-    cursor.execute(
-        """
-        SELECT DISTINCT brand_name
-        FROM resin
-        """
-    )
-    resin_brands = list(chain(*cursor.fetchall()))
     brand_name = st.text_input("Brand :")
-    if (brand_name in resin_brands):
-        cursor.execute(
-            """
-            SELECT DISTINCT color
-            FROM resin
-            WHERE brand_name = %s
-            """,
-            (brand_name,)
-        )
-        resin_colors = list(chain(*cursor.fetchall()))
-        color = st.text_input("Color :")
-        if (color in resin_colors):
-            resin_exists = True
-        else:
-            resin_exists = False
-            
-    else:
-        resin_exists = False
-    quantity = st.number_input("Quantity :")
-
-else:
+    color = st.text_input("Color :")
     cursor.execute(
         """
-        SELECT DISTINCT brand_name
-        FROM filament
-        """
+        SELECT 
+        FROM resin
+        WHERE brand_name = %s AND color = %s
+        """,
+        (brand_name.upper(), color.upper())
     )
+    if (len(cursor.fetchall()) == 0):
+        resin_exists = False
+    else:
+        resin_exists = True
+    quantity = st.number_input("Quantity :")
+    resin_button = st.button("Commit")
+elif (category == "Filament"):
+    filament_type = st.text_box("Type :")
+    brand_name = st.text_input("Brand :")
+    color = st.text_input("Color :")
+    cursor.execute(
+        """
+        SELECT 
+        FROM resin
+        WHERE brand_name = %s AND color = %s AND type %s
+        """,
+        (brand_name.upper(), color.upper(), filament_type.upper())
+    )
+    if (len(cursor.fetchall()) == 0):
+        filament_exists = False
+    else:
+        filament_exists = True
+    quantity = st.number_input("Quantity :")
+    filament_button = st.button("Commit")
 
 
 
 
 
 def add_printer_model(printer_model):
-    """
-    Create a new project into the projects table
-    :param conn:
-    :param project:
-    :return: project id
-    """
     cursor.execute(
         ''' INSERT INTO printer_model VALUES(%s,%s,%s,%s,%s,%s);''', 
         printer_model
     )
     db.commit()
 
-def add_fff_printer(printer_model):
-    """
-    Create a new project into the projects table
-    :param conn:
-    :param project:
-    :return: project id
-    """
+def add_fff_printer(conn, fff_printer):
     cursor.execute(
-        ''' INSERT INTO printer_model VALUES(%s,%s,%s,%s,%s,%s);''', 
-        printer_model
+        ''' INSERT INTO fff_printer(printer_name, model_name, current_nozzle_type, current_nozzle_size, current_bed_type, current_filament_id) 
+              VALUES(?,?,?,?,?,?) ''', 
+        fff_printer
     )
     db.commit()
+
+def add_sla_printer(conn, sla_printer):
+    cursor.execute(
+        ''' INSERT INTO fff_printer(printer_name, model_name, current_nozzle_type, current_nozzle_size, current_bed_type, current_filament_id) 
+              VALUES(?,?,?,?,?,?) ''', 
+        fff_printer
+    )
+    db.commit()
+    sql = ''' INSERT INTO sla_printer(printer_name, model_name, current_resin_id) 
+              VALUES(?,?,?) '''    
+    cur = conn.cursor()
+    cur.execute(sql, sla_printer)
+    conn.commit()
 
 def add_filament(conn, filament):
     """
