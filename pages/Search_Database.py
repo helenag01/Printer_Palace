@@ -52,9 +52,9 @@ if (category == "Printer Model"):
     values_list = []
     if (fff):
         values_list.append("fff_printer.printer_name AS Name")
-        values_list.append("fff_printer.current_nozzle_type AS Nozzle Type")
-        values_list.append("fff_printer.current_nozzle_size AS Nozzle Size")
-        values_list.append("fff_printer.current_bed_type AS Bed Type")
+        values_list.append("fff_printer.current_nozzle_type AS Nozzle_Type")
+        values_list.append("fff_printer.current_nozzle_size AS Nozzle_Size")
+        values_list.append("fff_printer.current_bed_type AS Bed_Type")
     if (sla):
         values_list.append("sla_printer.printer_name AS Name")
     if ("Model" in options):
@@ -82,7 +82,7 @@ if (category == "Printer Model"):
                     FROM printer_model
                         INNER JOIN fff_printer USING (model_name)
                         INNER JOIN sla_printer USING (model_name)
-                    WHERE model_name LIKE %s
+                    WHERE printer_model.model_name LIKE %s
                         AND brand_name LIKE %s
                         AND printer_type LIKE %s
                         AND bed_width BETWEEN %s AND %s
@@ -101,7 +101,7 @@ if (category == "Printer Model"):
                     FROM printer_model
                         INNER JOIN fff_printer USING (model_name)
                         INNER JOIN sla_printer USING (model_name)
-                    WHERE model_name LIKE %s
+                    WHERE printer_model.model_name LIKE %s
                         AND brand_name LIKE %s
                         AND printer_type LIKE %s
                         AND bed_width = %s
@@ -116,9 +116,9 @@ if (category == "Printer Model"):
                 SELECT """ + ", ".join(values_list) +
                 """
                 FROM printer_model
-                        INNER JOIN fff_printer USING (model_name)
-                        INNER JOIN sla_printer USING (model_name)
-                WHERE model_name LIKE %s
+                    INNER JOIN fff_printer ON fff_printer.model_name = printer_model.model_name
+                    INNER JOIN sla_printer ON sla_printer.model_name = printer_model.model_name
+                WHERE printer_model.model_name LIKE %s
                     AND brand_name LIKE %s
                     AND printer_type LIKE %s
                 """,
@@ -158,19 +158,19 @@ elif (category == "FFF Printer"):
     if ("Model" in options):
         values_list.append("fff_printer.model_name AS Model")
     if ("Nozzle type" in options):
-        values_list.append("fff_printer.current_nozzle_type AS Nozzle Type")
+        values_list.append("fff_printer.current_nozzle_type AS Nozzle_Type")
     if ("Nozzle size" in options):
-        values_list.append("fff_printer.current_nozzle_size AS Nozzle Size")
+        values_list.append("fff_printer.current_nozzle_size AS Nozzle_Size")
     if ("Bed type" in options):
-        values_list.append("fff_printer.current_bed_type AS Bed Type")
+        values_list.append("fff_printer.current_bed_type AS Bed_Type")
     if ("Filament type" in options):
-        values_list.append("filament.filament_type AS Filament Type")
+        values_list.append("filament.filament_type AS Filament_Type")
     if ("Filament brand" in options):
-        values_list.append("filament.brand_name AS Filament Brand")
+        values_list.append("filament.brand_name AS Filament_Brand")
     if ("Filament color" in options):
-        values_list.append("filament.color AS Filament Color")
+        values_list.append("filament.color AS Filament_Color")
     if ("Filament quantity" in options):
-        values_list.append("filament.quantity AS Filament Quantity")
+        values_list.append("filament.quantity AS Filament_Quantity")
 
     fff_button = st.button("Search")
     
@@ -263,11 +263,11 @@ elif (category == "SLA Printer"):
     if ("Model" in options):
         values_list.append("sla_printer.model_name AS Model")
     if ("Resin brand" in options):
-        values_list.append("resin.brand_name AS Resin Brand")
+        values_list.append("resin.brand_name AS Resin_Brand")
     if ("Resin color" in options):
-        values_list.append("resin.color AS Resin Color")
+        values_list.append("resin.color AS Resin_Color")
     if ("Resin quantity" in options):
-        values_list.append("resin.quantity AS Resin Quantity")
+        values_list.append("resin.quantity AS Resin_Quantity")
 
     sla_button = st.button("Search")
     
@@ -343,17 +343,17 @@ elif (category == "Filament"):
     if (fff):
         values_list.append("fff_printer.printer_name AS Name")
         values_list.append("fff_printer.model_name AS Model")
-        values_list.append("fff_printer.current_nozzle_type AS Nozzle Type")
-        values_list.append("fff_printer.current_nozzle_size AS Nozzle Size")
-        values_list.append("fff_printer.current_bed_type AS Bed Type")
+        values_list.append("fff_printer.current_nozzle_type AS Nozzle_Type")
+        values_list.append("fff_printer.current_nozzle_size AS Nozzle_Size")
+        values_list.append("fff_printer.current_bed_type AS Bed_Type")
     if ("Filament type" in options):
-        values_list.append("filament.filament_type AS Filament Type")
+        values_list.append("filament.filament_type AS Filament_Type")
     if ("Filament brand" in options):
-        values_list.append("filament.brand_name AS Filament Brand")
+        values_list.append("filament.brand_name AS Filament_Brand")
     if ("Filament color" in options):
-        values_list.append("filament.color AS Filament Color")
+        values_list.append("filament.color AS Filament_Color")
     if ("Filament quantity" in options):
-        values_list.append("filament.quantity AS Filament Quantity")
+        values_list.append("filament.quantity AS Filament_Quantity")
 
     filament_button = st.button("Search")
     
@@ -412,11 +412,11 @@ elif (category == "Resin"):
         values_list.append("sla_printer.printer_name AS Name")
         values_list.append("sla_printer.model_name AS Model")
     if ("Resin brand" in options):
-        values_list.append("resin.brand_name AS Resin Brand")
+        values_list.append("resin.brand_name AS Resin_Brand")
     if ("Resin color" in options):
-        values_list.append("resin.color AS Resin Color")
+        values_list.append("resin.color AS Resin_Color")
     if ("Resin quantity" in options):
-        values_list.append("resin.quantity AS Resin Quantity")
+        values_list.append("resin.quantity AS Resin_Quantity")
 
     resin_button = st.button("Search")
     
