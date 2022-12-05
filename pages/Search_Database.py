@@ -21,7 +21,7 @@ category = st.selectbox(
 if (category == "Printer Model"):
     model_name = "%" + st.text_input("Model :") + "%"
     brand_name = "%" + st.text_input("Brand :") + "%" 
-    printer_type = st.text_input("Type :")
+    printer_type = "%" + st.text_input("Type :") + "%"
     bed_specs = st.checkbox("Input bed specs")
     if (bed_specs):
         use_range = st.checkbox("Use range for bed specs")
@@ -75,23 +75,132 @@ if (category == "Printer Model"):
     if (printer_model_button):
         if (bed_specs):
             if (use_range):
+                if (fff):
+                    cursor.execute(
+                        """
+                        SELECT """ + ", ".join(values_list) +
+                        """
+                        FROM printer_model
+                            INNER JOIN fff_printer USING (model_name)
+                        WHERE printer_model.model_name LIKE %s
+                            AND brand_name LIKE %s
+                            AND printer_type LIKE %s
+                            AND bed_width BETWEEN %s AND %s
+                            AND bed_length BETWEEN %s AND %s
+                            AND bed_height BETWEEN %s AND %s
+                        """,
+                        (model_name.upper(), brand_name.upper(), printer_type.upper(), 
+                        bed_width[0], bed_width[1], bed_length[0],
+                        bed_length[1], bed_height[0], bed_height[1])
+                    )
+                elif (sla):
+                    cursor.execute(
+                        """
+                        SELECT """ + ", ".join(values_list) +
+                        """
+                        FROM printer_model
+                            INNER JOIN sla_printer USING (model_name)
+                        WHERE printer_model.model_name LIKE %s
+                            AND brand_name LIKE %s
+                            AND printer_type LIKE %s
+                            AND bed_width BETWEEN %s AND %s
+                            AND bed_length BETWEEN %s AND %s
+                            AND bed_height BETWEEN %s AND %s
+                        """,
+                        (model_name.upper(), brand_name.upper(), printer_type.upper(), 
+                        bed_width[0], bed_width[1], bed_length[0],
+                        bed_length[1], bed_height[0], bed_height[1])
+                    )
+                cursor.execute(
+                        """
+                        SELECT """ + ", ".join(values_list) +
+                        """
+                        FROM printer_model
+                        WHERE printer_model.model_name LIKE %s
+                            AND brand_name LIKE %s
+                            AND printer_type LIKE %s
+                            AND bed_width BETWEEN %s AND %s
+                            AND bed_length BETWEEN %s AND %s
+                            AND bed_height BETWEEN %s AND %s
+                        """,
+                        (model_name.upper(), brand_name.upper(), printer_type.upper(), 
+                        bed_width[0], bed_width[1], bed_length[0],
+                        bed_length[1], bed_height[0], bed_height[1])
+                    )
+            else:
+                if (fff):
+                    cursor.execute(
+                        """
+                        SELECT """ + ", ".join(values_list) +
+                        """
+                        FROM printer_model
+                            INNER JOIN fff_printer USING (model_name)
+                        WHERE printer_model.model_name LIKE %s
+                            AND brand_name LIKE %s
+                            AND printer_type LIKE %s
+                            AND bed_width = %s
+                            AND bed_length = %s
+                            AND bed_height = %s
+                        """,
+                        (model_name.upper(), brand_name.upper(), printer_type.upper(), bed_width, bed_length, bed_height)
+                    )
+                elif (sla):
+                    cursor.execute(
+                        """
+                        SELECT """ + ", ".join(values_list) +
+                        """
+                        FROM printer_model
+                            INNER JOIN sla_printer USING (model_name)
+                        WHERE printer_model.model_name LIKE %s
+                            AND brand_name LIKE %s
+                            AND printer_type LIKE %s
+                            AND bed_width = %s
+                            AND bed_length = %s
+                            AND bed_height = %s
+                        """,
+                        (model_name.upper(), brand_name.upper(), printer_type.upper(), bed_width, bed_length, bed_height)
+                    )  
+                else:
+                    cursor.execute(
+                        """
+                        SELECT """ + ", ".join(values_list) +
+                        """
+                        FROM printer_model
+                        WHERE printer_model.model_name LIKE %s
+                            AND brand_name LIKE %s
+                            AND printer_type LIKE %s
+                            AND bed_width = %s
+                            AND bed_length = %s
+                            AND bed_height = %s
+                        """,
+                        (model_name.upper(), brand_name.upper(), printer_type.upper(), bed_width, bed_length, bed_height)
+                    )  
+        else:
+            if (fff):
                 cursor.execute(
                     """
                     SELECT """ + ", ".join(values_list) +
                     """
                     FROM printer_model
-                        INNER JOIN fff_printer USING (model_name)
-                        INNER JOIN sla_printer USING (model_name)
+                        INNER JOIN fff_printer ON fff_printer.model_name = printer_model.model_name
                     WHERE printer_model.model_name LIKE %s
                         AND brand_name LIKE %s
                         AND printer_type LIKE %s
-                        AND bed_width BETWEEN %s AND %s
-                        AND bed_length BETWEEN %s AND %s
-                        AND bed_height BETWEEN %s AND %s
                     """,
-                    (model_name.upper(), brand_name.upper(), printer_type.upper(), 
-                    bed_width[0], bed_width[1], bed_length[0],
-                    bed_length[1], bed_height[0], bed_height[1])
+                    (model_name.upper(), brand_name.upper(), printer_type.upper())
+                )
+            elif (sla):
+                cursor.execute(
+                    """
+                    SELECT """ + ", ".join(values_list) +
+                    """
+                    FROM printer_model
+                        INNER JOIN sla_printer ON sla_printer.model_name = printer_model.model_name
+                    WHERE printer_model.model_name LIKE %s
+                        AND brand_name LIKE %s
+                        AND printer_type LIKE %s
+                    """,
+                    (model_name.upper(), brand_name.upper(), printer_type.upper())
                 )
             else:
                 cursor.execute(
@@ -99,46 +208,27 @@ if (category == "Printer Model"):
                     SELECT """ + ", ".join(values_list) +
                     """
                     FROM printer_model
-                        INNER JOIN fff_printer USING (model_name)
-                        INNER JOIN sla_printer USING (model_name)
                     WHERE printer_model.model_name LIKE %s
                         AND brand_name LIKE %s
                         AND printer_type LIKE %s
-                        AND bed_width = %s
-                        AND bed_length = %s
-                        AND bed_height = %s
                     """,
-                    (model_name.upper(), brand_name.upper(), printer_type.upper(), bed_width, bed_length, bed_height)
-                )    
-        else:
-            cursor.execute(
-                """
-                SELECT """ + ", ".join(values_list) +
-                """
-                FROM printer_model
-                    INNER JOIN fff_printer ON fff_printer.model_name = printer_model.model_name
-                    INNER JOIN sla_printer ON sla_printer.model_name = printer_model.model_name
-                WHERE printer_model.model_name LIKE %s
-                    AND brand_name LIKE %s
-                    AND printer_type LIKE %s
-                """,
-                (model_name.upper(), brand_name.upper(), printer_type.upper())
-            )
+                    (model_name.upper(), brand_name.upper(), printer_type.upper())
+                )
         columns = [column[0] for column in cursor.description]
         data = cursor.fetchall()
         df = pd.DataFrame(data, columns=columns)
         st.write(df)
 elif (category == "FFF Printer"):
-    printer_name = st.text_input("Name :")
-    model_name = st.text_input("Model :")
-    current_nozzle_type = st.text_input("Nozzle type :")
+    printer_name = "%" + st.text_input("Name :") + "%"
+    model_name = "%" + st.text_input("Model :") + "%"
+    current_nozzle_type = "%" + st.text_input("Nozzle type :") + "%"
     current_nozzle_size = st.number_input("Nozzle size :")
-    current_bed_type = st.text_input("Bed type :")
+    current_bed_type = "%" + st.text_input("Bed type :") + "%"
     filament_specs = st.checkbox("Input filament specs")
     if (filament_specs):
-        filament_type = st.text_input("Type :")
-        brand_name = st.text_input("Brand :")
-        color = st.text_input("Color :")
+        filament_type = "%" + st.text_input("Type :") + "%"
+        brand_name = "%" + st.text_input("Brand :") + "%"
+        color = "%" + st.text_input("Color :") + "%"
         quantity_range = st.checkbox("Use range for quantity")
         if (quantity_range):
             filament_quantity_range = st.slider(
@@ -322,9 +412,9 @@ elif (category == "SLA Printer"):
         df = pd.DataFrame(data, columns=columns)
         st.write(df)
 elif (category == "Filament"):
-    filament_type = st.text_input("Type :")
-    brand_name = st.text_input("Brand :")
-    color = st.text_input("Color :")
+    filament_type = "%" + st.text_input("Type :") + "%"
+    brand_name = "%" + st.text_input("Brand :") + "%"
+    color = "%" + st.text_input("Color :") + "%"
     quantity_range = st.checkbox("Use range for quantity")
     if (quantity_range):
         filament_quantity_range = st.slider(
@@ -391,8 +481,8 @@ elif (category == "Filament"):
         df = pd.DataFrame(data, columns=columns)
         st.write(df)
 elif (category == "Resin"):
-    brand_name = st.text_input("Brand :")
-    color = st.text_input("Color :")
+    brand_name = "%" + st.text_input("Brand :") + "%"
+    color = "%" + st.text_input("Color :") + "%"
     quantity_range = st.checkbox("Use range for quantity")
     if (quantity_range):
         filament_quantity_range = st.slider(
