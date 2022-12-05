@@ -6,7 +6,7 @@ from itertools import chain
 db = mysql.connector.connect(
     host = "localhost",
     user = "root",
-    password = "CPSC408!",
+    password = "Dukie393!mysql",
     database = "PrinterPalace"
 )
 
@@ -15,7 +15,7 @@ st.markdown("<h1 style='text-align: center;'>Search</h1>", unsafe_allow_html=Tru
 cursor = db.cursor()
 category = st.selectbox(
 "Select a category :",
-("","Printer Model", "FFF Printer", "SLA Printer", "Resin", "Filament")
+("","Printer Model", "FFF Printer", "FFF Printer - All Attributes", "SLA Printer", "SLA Printer - All Attributes", "Resin", "Resin Stock", "Filament", "Filament Stock")
 )
 
 if (category == "Printer Model"):
@@ -542,3 +542,90 @@ elif (category == "Resin"):
         df = pd.DataFrame(data, columns=columns)
         st.write(df)
 
+elif (category == "Resin Stock"):
+    category = st.selectbox("Group by:", ("", "Color", "Brand"))
+    if category == "Color":
+        button = st.button("Search")
+        if button:
+            cursor.execute(
+                '''SELECT * FROM resin_quantity_by_color;'''
+                )
+            columns = [column[0] for column in cursor.description]
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=columns)
+            st.write(df)
+    elif category == "Brand":
+        button = st.button("Search")
+        if button:
+            cursor.execute(
+                '''SELECT * FROM resin_quantity_by_brand;'''
+                )
+            columns = [column[0] for column in cursor.description]
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=columns)
+            st.write(df)
+
+elif (category == "Filament Stock"):
+    category = st.selectbox("Group by:",("", "Type", "Color", "Brand"))
+    if category == "Color":
+        button = st.button("Search")
+        if button:
+            cursor.execute(
+                '''SELECT * FROM filament_quantity_by_color;'''
+                )
+            columns = [column[0] for column in cursor.description]
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=columns)
+            st.write(df)
+    elif category == "Brand":
+        button = st.button("Search")
+        if button:
+            cursor.execute(
+                '''SELECT * FROM filament_quantity_by_brand;'''
+                )
+            columns = [column[0] for column in cursor.description]
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=columns)
+            st.write(df)
+    elif category == "Type":
+        button = st.button("Search")
+        if button:
+            cursor.execute(
+                '''SELECT * FROM filament_quantity_by_type;'''
+                )
+            columns = [column[0] for column in cursor.description]
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=columns)
+            st.write(df)
+
+elif (category == "FFF Printer - All Attributes"):
+    printer_name = "%" + st.text_input("Printer Name :") + "%"
+    button = st.button("Search")
+    if button:
+        cursor.execute(
+            '''SELECT printer_id, printer_name, pm.model_name, current_nozzle_type, current_nozzle_size, current_bed_type, pm.brand_name AS printer_brand, printer_type, bed_width, bed_length, bed_height, filament_type, f.brand_name AS filament_brand, color, quantity
+FROM fff_printer
+LEFT JOIN printer_model pm on fff_printer.model_name = pm.model_name
+LEFT JOIN filament f on f.filament_id = fff_printer.current_filament_id
+WHERE printer_name LIKE %s'''
+            ), printer_name.upper()
+        columns = [column[0] for column in cursor.description]
+        data = cursor.fetchall()
+        df = pd.DataFrame(data, columns=columns)
+        st.write(df)
+
+elif (category == "SLA Printer - All Attributes"):
+    printer_name = "%" + st.text_input("Printer Name :") + "%"
+    button = st.button("Search")
+    if button:
+        cursor.execute(
+            '''SELECT printer_id, printer_name, pm.model_name, pm.brand_name AS printer_brand, printer_type, bed_width, bed_length, bed_height, r.brand_name  AS resin_brand, color, quantity
+FROM sla_printer
+LEFT JOIN printer_model pm on sla_printer.model_name = pm.model_name
+LEFT JOIN resin r on r.resin_id = sla_printer.current_resin_id
+WHERE printer_name LIKE %s'''
+            ), printer_name.upper()
+        columns = [column[0] for column in cursor.description]
+        data = cursor.fetchall()
+        df = pd.DataFrame(data, columns=columns)
+        st.write(df)
