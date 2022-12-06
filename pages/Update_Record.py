@@ -5,7 +5,7 @@ from itertools import chain
 db = mysql.connector.connect(
     host = "localhost",
     user = "root",
-    password = "Dukie393!mysql",
+    password = "CPSC408!",
     database = "PrinterPalace"
 )
 
@@ -53,14 +53,16 @@ if (category == "Nozzle Swap"):
         printers_mod = printers
         nozzles_mod = nozzles
 
-        del printers_mod[p1idx]
-        del nozzles_mod[p1idx]
+        # del printers_mod[p1idx]
+        # del nozzles_mod[p1idx]
 
         printer_2 = st.selectbox(
         "Printer 2 :",
         (printers_mod))
 
-        if printer_2 != "":
+        if printer_2 == printer_1:
+            st.error("ERROR - Select 2 different printers")
+        elif printer_2 != "":
             # with st.container():
             #     st.text(nozzles_mod[p1idx])
             button = st.button("Swap")

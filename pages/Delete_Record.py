@@ -11,11 +11,8 @@ db = mysql.connector.connect(
 
 st.markdown("<h1 style='text-align: center;'>Delete</h1>", unsafe_allow_html=True)
 
-cursor = db.cursor()
-category = st.selectbox(
-"Select a category :",
-("","Printer Model", "FFF Printer", "SLA Printer", "Resin", "Filament")
-)
 
 
+
+    
 

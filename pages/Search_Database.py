@@ -3,6 +3,7 @@ import pandas as pd
 import mysql.connector
 from itertools import chain
 
+
 db = mysql.connector.connect(
     host = "localhost",
     user = "root",
@@ -10,16 +11,27 @@ db = mysql.connector.connect(
     database = "PrinterPalace"
 )
 
+def convert_df(df):
+   return df.to_csv(index=False).encode('utf-8')
+
 st.markdown("<h1 style='text-align: center;'>Search</h1>", unsafe_allow_html=True)
 
 cursor = db.cursor()
-st.subheader("Filters :")
+
+cursor.execute(
+    """
+    COMMIT
+    """
+    )
+
+
 category = st.selectbox(
 "Select a category :",
 ("","Printer Model", "FFF Printer", "FFF Printer - All Attributes", "SLA Printer", "SLA Printer - All Attributes", "Resin", "Resin Stock", "Filament", "Filament Stock")
 )
 
 if (category == "Printer Model"):
+    st.subheader("Filters :")
     model_name = "%" + st.text_input("Model :") + "%"
     brand_name = "%" + st.text_input("Brand :") + "%" 
     printer_type = "%" + st.text_input("Type :") + "%"
@@ -361,7 +373,15 @@ if (category == "Printer Model"):
         else:
             df = pd.DataFrame(data, columns=columns)
             st.write(df)
+        csv = convert_df(df)
+        st.download_button(
+            "Download",
+            csv,
+            "search_results.csv",
+            key='download-csv'
+        )
 elif (category == "FFF Printer"):
+    st.subheader("Filters :")
     printer_name = "%" + st.text_input("Name :") + "%"
     model_name = "%" + st.text_input("Model :") + "%"
     current_nozzle_type = "%" + st.text_input("Nozzle type :") + "%"
@@ -384,6 +404,7 @@ elif (category == "FFF Printer"):
                 )
             else:
                 quantity = st.number_input("Quantity :")
+    st.header("")
     st.subheader("What do you want to search for? (Select all that apply) :")
     options = st.multiselect(
         "",
@@ -575,7 +596,15 @@ elif (category == "FFF Printer"):
         data = cursor.fetchall()
         df = pd.DataFrame(data, columns=columns)
         st.write(df)
+        csv = convert_df(df)
+        st.download_button(
+            "Download",
+            csv,
+            "search_results.csv",
+            key='download-csv'
+        )
 elif (category == "SLA Printer"):
+    st.subheader("Filters :")
     printer_name = "%" + st.text_input("Name :") + "%"
     model_name = "%" + st.text_input("Model :") + "%"
     resin_specs = st.checkbox("Input resin specs")
@@ -592,6 +621,7 @@ elif (category == "SLA Printer"):
                 )
             else:
                 quantity = st.number_input("Quantity :")
+    st.header("")
     st.subheader("What do you want to search for? (Select all that apply) :")
     options = st.multiselect(
         "",
@@ -679,7 +709,15 @@ elif (category == "SLA Printer"):
         data = cursor.fetchall()
         df = pd.DataFrame(data, columns=columns)
         st.write(df)
+        csv = convert_df(df)
+        st.download_button(
+            "Download",
+            csv,
+            "search_results.csv",
+            key='download-csv'
+        )
 elif (category == "Filament"):
+    st.subheader("Filters :")
     filament_type = "%" + st.text_input("Type :") + "%"
     brand_name = "%" + st.text_input("Brand :") + "%"
     color = "%" + st.text_input("Color :") + "%"
@@ -693,6 +731,7 @@ elif (category == "Filament"):
             )
         else:
             quantity = st.number_input("Quantity :")
+    st.header("")
     st.subheader("What do you want to search for? (Select all that apply) :")
     options = st.multiselect(
         "",
@@ -766,7 +805,15 @@ elif (category == "Filament"):
         data = cursor.fetchall()
         df = pd.DataFrame(data, columns=columns)
         st.write(df)
+        csv = convert_df(df)
+        st.download_button(
+            "Download",
+            csv,
+            "search_results.csv",
+            key='download-csv'
+        )
 elif (category == "Resin"):
+    st.subheader("Filters :")
     brand_name = "%" + st.text_input("Brand :") + "%"
     color = "%" + st.text_input("Color :") + "%"
     quantity_filter = st.checkbox("Filter by quantity")
@@ -779,6 +826,7 @@ elif (category == "Resin"):
             )
         else:
             quantity = st.number_input("Quantity :")
+    st.header("")
     st.subheader("What do you want to search for? (Select all that apply) :")
     options = st.multiselect(
         "",
@@ -844,8 +892,15 @@ elif (category == "Resin"):
         data = cursor.fetchall()
         df = pd.DataFrame(data, columns=columns)
         st.write(df)
-
+        csv = convert_df(df)
+        st.download_button(
+            "Download",
+            csv,
+            "search_results.csv",
+            key='download-csv'
+        )
 elif (category == "Resin Stock"):
+    st.subheader("Filters :")
     category = st.selectbox("Group by:", ("", "Color", "Brand"))
     if category == "Color":
         button = st.button("Search")
@@ -857,6 +912,13 @@ elif (category == "Resin Stock"):
             data = cursor.fetchall()
             df = pd.DataFrame(data, columns=columns)
             st.write(df)
+            csv = convert_df(df)
+            st.download_button(
+                "Download",
+                csv,
+                "search_results.csv",
+                key='download-csv'
+            )
     elif category == "Brand":
         button = st.button("Search")
         if button:
@@ -867,8 +929,15 @@ elif (category == "Resin Stock"):
             data = cursor.fetchall()
             df = pd.DataFrame(data, columns=columns)
             st.write(df)
-
+            csv = convert_df(df)
+            st.download_button(
+                "Download",
+                csv,
+                "search_results.csv",
+                key='download-csv'
+            )
 elif (category == "Filament Stock"):
+    st.subheader("Filters :")
     category = st.selectbox("Group by:",("", "Type", "Color", "Brand"))
     if category == "Color":
         button = st.button("Search")
@@ -880,6 +949,13 @@ elif (category == "Filament Stock"):
             data = cursor.fetchall()
             df = pd.DataFrame(data, columns=columns)
             st.write(df)
+            csv = convert_df(df)
+            st.download_button(
+                "Download",
+                csv,
+                "search_results.csv",
+                key='download-csv'
+            )
     elif category == "Brand":
         button = st.button("Search")
         if button:
@@ -890,6 +966,13 @@ elif (category == "Filament Stock"):
             data = cursor.fetchall()
             df = pd.DataFrame(data, columns=columns)
             st.write(df)
+            csv = convert_df(df)
+            st.download_button(
+                "Download",
+                csv,
+                "search_results.csv",
+                key='download-csv'
+            )
     elif category == "Type":
         button = st.button("Search")
         if button:
@@ -900,8 +983,16 @@ elif (category == "Filament Stock"):
             data = cursor.fetchall()
             df = pd.DataFrame(data, columns=columns)
             st.write(df)
+            csv = convert_df(df)
+            st.download_button(
+                "Download",
+                csv,
+                "search_results.csv",
+                key='download-csv'
+            )
 
 elif (category == "FFF Printer - All Attributes"):
+    st.subheader("Filters :")
     printer_name = "%" + st.text_input("Printer Name :") + "%"
     button = st.button("Search")
     if button:
@@ -916,8 +1007,16 @@ WHERE printer_name LIKE %s""", (printer_name.upper(),)
         data = cursor.fetchall()
         df = pd.DataFrame(data, columns=columns)
         st.write(df)
+        csv = convert_df(df)
+        st.download_button(
+            "Download",
+            csv,
+            "search_results.csv",
+            key='download-csv'
+        )
 
 elif (category == "SLA Printer - All Attributes"):
+    st.subheader("Filters :")
     printer_name = "%" + st.text_input("Printer Name :") + "%"
     button = st.button("Search")
     if button:
@@ -932,3 +1031,10 @@ WHERE printer_name LIKE %s''', (printer_name.upper(),)
         data = cursor.fetchall()
         df = pd.DataFrame(data, columns=columns)
         st.write(df)
+        csv = convert_df(df)
+        st.download_button(
+            "Download",
+            csv,
+            "search_results.csv",
+            key='download-csv'
+        )
