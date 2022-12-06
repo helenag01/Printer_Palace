@@ -68,32 +68,21 @@ if (category == "Nozzle Swap"):
             button = st.button("Swap")
             if button:
                 cursor.execute(
-                    '''START TRANSACTION;'''
-                )
-                cursor.execute(
-                    '''CALL sp_getNozzle(%s, @t);''',(printer_1,)
-                )
-                cursor.execute(
-                    '''CALL sp_getNozzle(%s, @u);''',(printer_2,)
-                )
-                cursor.execute(
-                    '''SAVEPOINT x;'''
-                )
-                cursor.execute(
-                    '''UPDATE fff_printer
+                    '''
+                    START TRANSACTION;
+                    CALL sp_getNozzle(%s, @t);
+                    CALL sp_getNozzle(%s, @u);
+                    SAVEPOINT x;
+                    UPDATE fff_printer
                         SET current_nozzle_type = @t
-                        WHERE printer_name = %s;''', (printer_2,)
-                )
-                cursor.execute(
-                    '''UPDATE fff_printer
+                        WHERE printer_name = %s;
+                    UPDATE fff_printer
                         SET current_nozzle_type = @u
-                        WHERE printer_name = %s;''', (printer_1,)
+                        WHERE printer_name = %s;
+                    COMMIT;
+                    '''
+                    ,(printer_1, printer_2, printer_2, printer_1)
                 )
-                undo = st.button("Undo")
-                if undo:
-                    cursor.execute(
-                    '''ROLLBACK TO x;'''
-                    )
         else:
             cursor.execute('''COMMIT;''')
     else:

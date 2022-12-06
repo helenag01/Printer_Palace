@@ -30,6 +30,7 @@ category = st.selectbox(
 ("","Printer Model", "FFF Printer", "FFF Printer - All Attributes", "SLA Printer", "SLA Printer - All Attributes", "Resin", "Resin Stock", "Filament", "Filament Stock")
 )
 
+
 if (category == "Printer Model"):
     st.subheader("Filters :")
     model_name = "%" + st.text_input("Model :") + "%"
@@ -39,15 +40,15 @@ if (category == "Printer Model"):
     if (bed_specs):
         use_range = st.checkbox("Use range for bed specs")
         if (use_range):
-            bed_width_range = st.slider(
+            bed_width = st.slider(
                 "Bed width :",
                 0.00, 750.00, (250.00, 500.00)
             )
-            bed_length_range = st.slider(
+            bed_length = st.slider(
                 "Bed length :",
                 0.00, 750.00, (250.00, 500.00)
             )
-            bed_height_range = st.slider(
+            bed_height = st.slider(
                 "Bed height :",
                 0.00, 1000.00, (250.00, 750.00)
             )
@@ -175,24 +176,46 @@ if (category == "Printer Model"):
                     )
                     columns = [column[0] for column in cursor.description]
                     data = cursor.fetchall()
-                cursor.execute(
-                        """
-                        SELECT """ + ", ".join(values_list) +
-                        """
-                        FROM printer_model
-                        WHERE printer_model.model_name LIKE %s
-                            AND brand_name LIKE %s
-                            AND printer_type LIKE %s
-                            AND bed_width BETWEEN %s AND %s
-                            AND bed_length BETWEEN %s AND %s
-                            AND bed_height BETWEEN %s AND %s
-                        """,
-                        (model_name.upper(), brand_name.upper(), printer_type.upper(), 
-                        bed_width[0], bed_width[1], bed_length[0],
-                        bed_length[1], bed_height[0], bed_height[1])
-                    )
-                columns = [column[0] for column in cursor.description]
-                data = cursor.fetchall()
+                if (fff):
+                    cursor.execute(
+                            """
+                            SELECT """ + ", ".join(values_list) +
+                            """
+                            FROM printer_model
+                                INNER JOIN fff_printer USING (model_name)
+                            WHERE printer_model.model_name LIKE %s
+                                AND brand_name LIKE %s
+                                AND printer_type LIKE %s
+                                AND bed_width BETWEEN %s AND %s
+                                AND bed_length BETWEEN %s AND %s
+                                AND bed_height BETWEEN %s AND %s
+                            """,
+                            (model_name.upper(), brand_name.upper(), printer_type.upper(), 
+                            bed_width[0], bed_width[1], bed_length[0],
+                            bed_length[1], bed_height[0], bed_height[1])
+                        )
+                    columns = [column[0] for column in cursor.description]
+                    data = cursor.fetchall()
+                elif (sla):
+                    cursor.execute(
+                            """
+                            SELECT """ + ", ".join(values_list) +
+                            """
+                            FROM printer_model
+                                INNER JOIN sla_printer USING (model_name)
+                            WHERE printer_model.model_name LIKE %s
+                                AND brand_name LIKE %s
+                                AND printer_type LIKE %s
+                                AND bed_width BETWEEN %s AND %s
+                                AND bed_length BETWEEN %s AND %s
+                                AND bed_height BETWEEN %s AND %s
+                            """,
+                            (model_name.upper(), brand_name.upper(), printer_type.upper(), 
+                            bed_width[0], bed_width[1], bed_length[0],
+                            bed_length[1], bed_height[0], bed_height[1])
+                        )
+                    columns = [column[0] for column in cursor.description]
+                    data = cursor.fetchall()
             else:
                 if (fff and sla):
                     cursor.execute(
