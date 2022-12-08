@@ -5,7 +5,7 @@ from itertools import chain
 db = mysql.connector.connect(
     host = "localhost",
     user = "root",
-    password = "CPSC408!",
+    password = "Dukie393!mysql",
     database = "PrinterPalace"
 )
 
@@ -18,12 +18,6 @@ st.markdown("<h1 style='text-align: center;'>New Record</h1>", unsafe_allow_html
 # MYSQL
 
 cursor = db.cursor()
-
-cursor.execute(
-    """
-    COMMIT
-    """
-    )
 
 def add_printer_model(printer_model):
     cursor.execute(

@@ -7,7 +7,7 @@ from itertools import chain
 db = mysql.connector.connect(
     host = "localhost",
     user = "root",
-    password = "CPSC408!",
+    password = "Dukie393!mysql",
     database = "PrinterPalace"
 )
 
@@ -15,13 +15,6 @@ db = mysql.connector.connect(
 st.markdown("<h1 style='text-align: center;'>Delete</h1>", unsafe_allow_html=True)
 
 cursor = db.cursor()
-
-cursor.execute(
-    """
-    COMMIT
-    """
-    )
-
 
 category = st.selectbox(
 "Select a category :",

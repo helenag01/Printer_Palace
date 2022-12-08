@@ -5,7 +5,7 @@ from itertools import chain
 db = mysql.connector.connect(
     host = "localhost",
     user = "root",
-    password = "CPSC408!",
+    password = "Dukie393!mysql",
     database = "PrinterPalace"
 )
 
