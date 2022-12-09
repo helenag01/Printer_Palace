@@ -917,7 +917,7 @@ elif (category == "Resin"):
         )
 elif (category == "Resin Stock"):
     st.subheader("Filters :")
-    category = st.selectbox("Group by:", ("", "Color", "Brand"))
+    category = st.selectbox("Group by:", ("", "Color", "Brand", "None"))
     if category == "Color":
         button = st.button("Search")
         if button:
@@ -952,9 +952,27 @@ elif (category == "Resin Stock"):
                 "search_results.csv",
                 key='download-csv'
             )
+    elif category == "None":
+        button = st.button("Search")
+        if button:
+            cursor.execute(
+                '''SELECT * FROM all_resin_quantity;'''
+                )
+            columns = [column[0] for column in cursor.description]
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=columns)
+            st.write(df)
+            csv = convert_df(df)
+            st.download_button(
+                "Download",
+                csv,
+                "search_results.csv",
+                key='download-csv'
+            )
+
 elif (category == "Filament Stock"):
     st.subheader("Filters :")
-    category = st.selectbox("Group by:",("", "Type", "Color", "Brand"))
+    category = st.selectbox("Group by:",("", "Type", "Color", "Brand", "None"))
     if category == "Color":
         button = st.button("Search")
         if button:
@@ -994,6 +1012,23 @@ elif (category == "Filament Stock"):
         if button:
             cursor.execute(
                 '''SELECT * FROM filament_quantity_by_type;'''
+                )
+            columns = [column[0] for column in cursor.description]
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=columns)
+            st.write(df)
+            csv = convert_df(df)
+            st.download_button(
+                "Download",
+                csv,
+                "search_results.csv",
+                key='download-csv'
+            )
+    elif category == "None":
+        button = st.button("Search")
+        if button:
+            cursor.execute(
+                '''SELECT * FROM all_filament_quantity;'''
                 )
             columns = [column[0] for column in cursor.description]
             data = cursor.fetchall()
