@@ -5,9 +5,9 @@ from itertools import chain
 
 
 db = mysql.connector.connect(
-    host = "localhost",
-    user = "root",
-    password = "Dukie393!mysql",
+    host = "",
+    user = "",
+    password = "",
     database = "PrinterPalace"
 )
 
