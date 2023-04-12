@@ -26,6 +26,12 @@ section in each file with your host, user, and password
 
 7. The application will open in your default brower and is ready for use!
 
+Dependencies:
+streamlit
+pandas
+mysql.connector
+itertools
+
 References:
 - Class notes
 - https://docs.streamlit.io/library/api-reference
